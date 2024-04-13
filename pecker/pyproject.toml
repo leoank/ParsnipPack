@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "pecker"
+version = "0.1.0"
+description = ""
+authors = ["Ankur Kumar <ank@leoank.me>"]
+readme = "README.md"
+packages = [{ include = "pecker", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+click = "^8.1"
+pydantic = "^2.7"
+pydantic-settings = "^2.2"
+googlemaps = "^4.10"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.3.6"
+ipykernel = "^6.29.4"
+
+[tool.poetry.scripts]
+pecker = "pecker.cli:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
