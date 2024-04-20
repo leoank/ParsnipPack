@@ -12,6 +12,10 @@ click = "^8.1"
 pydantic = "^2.7"
 pydantic-settings = "^2.2"
 googlemaps = "^4.10"
+pandas = "^2.2"
+numpy = "^1.26.4"
+pyarrow = "^15.0"
+fastparquet = "^2024.0"
 
 
 [tool.poetry.group.dev.dependencies]
