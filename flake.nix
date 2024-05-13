@@ -48,6 +48,7 @@
                   packages = with pkgs; [
                     poetry
                     micromamba
+                    duckdb
                   ];
                   enterShell = ''
                     export LD_LIBRARY_PATH=$NIX_LD_LIBRARY_PATH
@@ -55,6 +56,8 @@
                     micromamba env create -n ppack -r .venv -c conda-forge python=3.10
                     micromamba activate .venv/envs/ppack
                     python -m ipykernel install --user --name ppack
+                    poetry install -C paint
+                    poetry install -C pecker
                   '';
                 }
               ];
