@@ -35,6 +35,9 @@ def get_times(reviews_df: pd.DataFrame):
 
 def parse(hits_df: pd.DataFrame, reviews_df: pd.DataFrame):
     oldest_times = get_times(reviews_df)
+    is_restaurant = [r_type == "restaurant" for r_type in hits_df["types"]]
+    is_veg = [r_type == "vegetarian_restaurant" for r_type in hits_df["types"]]
+    is_vegan = [r_type == "vegan_restaurant" for r_type in hits_df["types"]]
     locs = [d["location"] for d in list(hits_df["geometry"]) if "location" in d]
     # descs = [d["overview"] for d in list(reviews_df["editorial_summary"]) if "overview" in d]
 
@@ -43,7 +46,14 @@ def parse(hits_df: pd.DataFrame, reviews_df: pd.DataFrame):
             "name": hits_df["name"],
             "location": locs,
             "rating": hits_df["rating"],
+            "user_ratings_total": hits_df["user_ratings_total"],
+            "types": hits_df["types"],
+            "rtype": reviews_df["types"],
+            "photos": hits_df["photos"],
             "serves_veg": reviews_df["serves_vegetarian_food"],
+            "restaurant": is_restaurant,
+            "vegetarian_restaurant": is_veg,
+            "vegan_restaurant": is_vegan,
             "time": oldest_times,
         }
     )
@@ -62,11 +72,13 @@ def scrape():
         radius=10,
     )
     hits_df = pd.DataFrame.from_dict(hits["results"])
+    next_token = None
     if "next_page_token" in hits.keys():
         next_token = hits["next_page_token"]
 
     while True:
         try:
+            time.sleep(5)
             hits = places.places(
                 gmaps,
                 query="restaurants",
@@ -83,14 +95,15 @@ def scrape():
                 break
 
         except gex.ApiError as e:
-            time.sleep(1)
+            print(e)
 
     reviews = []
     for i in range(len(hits_df)):
         reviews.append(places.place(gmaps, hits_df.loc[i, "place_id"])["result"])
 
-    reviews_df = pd.DataFrame.from_dict(reviews)
+    reviews_df = pd.DataFrame.from_records(reviews)
 
     summary = parse(hits_df, reviews_df)
-    summary.to_parquet(Path(__file__).parents[2].joinpath("data/bos_initial.parquet"))
-
+    save_dir = Path(__file__).parents[2].joinpath(f"data/{int(time.time())}")
+    save_dir.mkdir(parents=True, exist_ok=True)
+    summary.to_parquet(save_dir.joinpath("bos_initial.parquet"))
