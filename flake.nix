@@ -41,6 +41,7 @@
                   env.NIX_LD = nixpkgs.lib.fileContents "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
                   env.NIX_LD_LIBRARY_PATH = nixpkgs.lib.makeLibraryPath [
                     # Add needed packages here
+                    pkgs.stdenv.cc.cc
                     pkgs.libGL # matplotlib
                   ];
                   # https://devenv.sh/reference/options/
